@@ -21,6 +21,7 @@ pub struct HttpServer { }
 impl HttpServer {
     pub fn run(&mut self, addr: String, port: i32) {
         let listener = TcpListener::bind(format!("{addr}:{port}")).unwrap();
+        println!("Server started on {}:{}", addr, port);
         for stream in listener.incoming() {
             let stream = stream.unwrap();
             self.handle_connection(stream);
@@ -28,6 +29,8 @@ impl HttpServer {
     }
 
     fn handle_connection(&mut self, mut stream: TcpStream) {
+        println!("New connection from {}", stream.peer_addr().unwrap().to_string());
+
         let buf_reader = BufReader::new(&mut stream);
         let data: Vec<String> = buf_reader
             .lines()

@@ -11,4 +11,4 @@ Simple static http server written in rust.
 - [ ] Add config cupport
     - [ ] Ip and port
     - [ ] Assets folders
-- [ ] More logs
+- [x] More logs
