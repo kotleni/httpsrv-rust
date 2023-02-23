@@ -1,5 +1,5 @@
 ## httpsrv-rust
-Simple http server written in rust. 
+Simple static http server written in rust. 
 
 ### ToDo
 - [x] Basic http server
@@ -8,5 +8,7 @@ Simple http server written in rust.
     - [ ] Regular files
     - [ ] Images
     - [ ] Video
-- [ ] Custom assets folders support
+- [ ] Add config cupport
+    - [ ] Ip and port
+    - [ ] Assets folders
 - [ ] More logs
