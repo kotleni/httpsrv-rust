@@ -1,7 +1,8 @@
+
 use std::{
     io::{prelude::*, BufReader},
     net::{TcpListener, TcpStream},
-    fs::{read_dir, read_to_string}
+    fs::{read_dir, read, read_to_string}
 };
 
 pub struct HttpRequest {
@@ -12,7 +13,7 @@ pub struct HttpRequest {
 
 pub struct HttpResult {
     pub code: i32,
-    pub content: String,
+    pub content: Vec<u8>,
     pub content_type: String
 }
 
@@ -59,13 +60,44 @@ impl HttpServer {
             }
         
             if founded_file_path == "" {
-                let result = self.build_result(HttpResult { code: 200, content: files_html, content_type: "text/html; charset=utf-8".to_string() });
-                let _ = stream.write_all(result.as_bytes());
+                let result = self.build_result(HttpResult { code: 200, content: files_html.as_bytes().to_vec(), content_type: "text/html; charset=utf-8".to_string() });
+                let _ = stream.write_all(result.as_slice());
                 return;
             } else {
-                let content = read_to_string(format!("./assets{founded_file_path}")).unwrap();
-                let result = self.build_result(HttpResult { code: 200, content: content, content_type: "text/html; charset=utf-8".to_string() });
-                let _ = stream.write_all(result.as_bytes());
+                let mut content_type = "application/octet-stream";
+                let mut isString = false;
+
+                if founded_file_path.ends_with(".png") {
+                    content_type = "image/png";
+                }
+
+                if founded_file_path.ends_with(".jpg") || founded_file_path.ends_with(".jpeg") {
+                    content_type = "image/jpeg";
+                }
+
+                if founded_file_path.ends_with(".mp4") {
+                    content_type = "video/mp4";
+                }
+
+                if founded_file_path.ends_with(".txt") || founded_file_path.ends_with(".md")  {
+                    content_type = "text/plain; charset=utf-8";
+                    isString = true;
+                }
+
+                if founded_file_path.ends_with(".html") || founded_file_path.ends_with(".htm") {
+                    content_type = "text/html; charset=utf-8";
+                    isString = true;
+                }
+
+                if(isString) {
+                    let content = read_to_string(format!("./assets{founded_file_path}")).unwrap();
+                    let result = self.build_result(HttpResult { code: 200, content: content.as_bytes().to_vec(), content_type: content_type.to_string() });
+                    let _ = stream.write_all(result.as_slice());
+                } else {
+                    let content = read(format!("./assets{founded_file_path}")).unwrap();
+                    let result = self.build_result(HttpResult { code: 200, content: content, content_type: content_type.to_string() });
+                    let _ = stream.write_all(result.as_slice());
+                }
                 return;
             }
         }
@@ -98,14 +130,17 @@ impl HttpServer {
         return Some(HttpRequest{ method: method.to_string(), url: url.to_string(), user_agent: user_agent.to_string() });
     }
     
-    fn build_result(&mut self, result: HttpResult) -> String {
+    fn build_result(&mut self, result: HttpResult) -> Vec<u8> {
         let code = result.code;
         let content = result.content;
         let content_length = content.len();
         let content_type = result.content_type;
         let header = format!("Content-Length: {content_length}\r\nContent-Type: {content_type}\r\n");
     
-        let response = format!("HTTP/1.1 {code} OK\r\n{header}\r\n{content}");
-        return response;
+        let result_header = format!("HTTP/1.1 {code} OK\r\n{header}\r\n");
+        let mut result_data: Vec<u8> = Vec::new();
+        result_data.extend(result_header.as_bytes().iter());
+        result_data.extend(content.iter().copied());
+        return result_data;
     }
 }
