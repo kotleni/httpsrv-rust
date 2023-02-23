@@ -7,7 +7,7 @@ Simple static http server written in rust.
     - [x] Plain text
     - [x] Regular files
     - [x] Images
-    - [ ] Video
+    - [x] Video
 - [ ] Add config cupport
     - [ ] Ip and port
     - [ ] Assets folders
