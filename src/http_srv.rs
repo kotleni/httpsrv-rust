@@ -60,14 +60,14 @@ impl HttpServer {
             }
         
             if founded_file_path == "" {
-                let mut template_content = read_to_string(format!("./assets/home.html")).unwrap();
+                let mut template_content = read_to_string(format!("./templates/home.html")).unwrap();
                 template_content = template_content.replace("{content}", &files_html);
                 let result = self.build_result(HttpResult { code: 200, content: template_content.as_bytes().to_vec(), content_type: "text/html; charset=utf-8".to_string() });
                 let _ = stream.write_all(result.as_slice());
                 return;
             } else {
                 let mut content_type = "application/octet-stream";
-                let mut isString = false;
+                let mut is_string = false;
 
                 if founded_file_path.ends_with(".png") {
                     content_type = "image/png";
@@ -83,15 +83,15 @@ impl HttpServer {
 
                 if founded_file_path.ends_with(".txt") || founded_file_path.ends_with(".md")  {
                     content_type = "text/plain; charset=utf-8";
-                    isString = true;
+                    is_string = true;
                 }
 
                 if founded_file_path.ends_with(".html") || founded_file_path.ends_with(".htm") {
                     content_type = "text/html; charset=utf-8";
-                    isString = true;
+                    is_string = true;
                 }
 
-                if isString {
+                if is_string {
                     let content = read_to_string(format!("./assets{founded_file_path}")).unwrap();
                     let result = self.build_result(HttpResult { code: 200, content: content.as_bytes().to_vec(), content_type: content_type.to_string() });
                     let _ = stream.write_all(result.as_slice());
