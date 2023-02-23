@@ -60,7 +60,9 @@ impl HttpServer {
             }
         
             if founded_file_path == "" {
-                let result = self.build_result(HttpResult { code: 200, content: files_html.as_bytes().to_vec(), content_type: "text/html; charset=utf-8".to_string() });
+                let mut template_content = read_to_string(format!("./assets/home.html")).unwrap();
+                template_content = template_content.replace("{content}", &files_html);
+                let result = self.build_result(HttpResult { code: 200, content: template_content.as_bytes().to_vec(), content_type: "text/html; charset=utf-8".to_string() });
                 let _ = stream.write_all(result.as_slice());
                 return;
             } else {
@@ -89,7 +91,7 @@ impl HttpServer {
                     isString = true;
                 }
 
-                if(isString) {
+                if isString {
                     let content = read_to_string(format!("./assets{founded_file_path}")).unwrap();
                     let result = self.build_result(HttpResult { code: 200, content: content.as_bytes().to_vec(), content_type: content_type.to_string() });
                     let _ = stream.write_all(result.as_slice());
