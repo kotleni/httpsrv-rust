@@ -8,8 +8,3 @@ Simple static http server written in rust.
     - [x] Regular files
     - [x] Images
     - [x] Video
-- [ ] Add config cupport
-    - [ ] Ip and port
-    - [ ] Home page disabling
-    - [ ] Assets folders
-- [x] More logs
